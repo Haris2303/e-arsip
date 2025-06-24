@@ -11,13 +11,13 @@
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+-   [Simple, fast routing engine](https://laravel.com/docs/routing).
+-   [Powerful dependency injection container](https://laravel.com/docs/container).
+-   Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+-   Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+-   Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+-   [Robust background job processing](https://laravel.com/docs/queues).
+-   [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
@@ -35,14 +35,14 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 
 ### Premium Partners
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+-   **[Vehikl](https://vehikl.com)**
+-   **[Tighten Co.](https://tighten.co)**
+-   **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+-   **[64 Robots](https://64robots.com)**
+-   **[Curotec](https://www.curotec.com/services/technologies/laravel)**
+-   **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+-   **[Redberry](https://redberry.international/laravel-development)**
+-   **[Active Logic](https://activelogic.com)**
 
 ## Contributing
 
@@ -59,3 +59,83 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+# Kode Arsip
+
+```php
+// users
+Schema::create('users', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->string('email')->unique();
+    $table->string('password');
+    $table->enum('role', ['admin', 'user'])->default('user');
+    $table->timestamps();
+});
+
+
+// bidang
+Schema::create('bidang', function (Blueprint $table) {
+    $table->id();
+    $table->string('nama');
+    $table->string('kode')->nullable();
+    $table->timestamps();
+});
+
+
+// surat masuk
+Schema::create('surat_masuk', function (Blueprint $table) {
+    $table->id();
+    $table->string('mail_number');
+    $table->date('mail_date');
+    $table->date('received_date');
+    $table->string('sender');
+    $table->string('agenda_number')->nullable();
+    $table->string('subject');
+    $table->enum('priority', ['very urgent', 'urgent', 'confidential'])->nullable();
+    $table->text('notes')->nullable();
+    $table->string('file_path')->nullable();
+    $table->enum('status', ['active', 'archived'])->default('active');
+    $table->timestamps();
+    $table->foreignId('user_id')->constrained()->onDelete('cascade');
+});
+
+
+// disposisi masuk
+Schema::create('disposisi_masuk', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('surat_masuk_id')->constrained('surat_masuk')->onDelete('cascade');
+    $table->foreignId('bidang_id')->constrained('bidang')->onDelete('restrict');
+    $table->json('harapan_tindakan')->nullable(); // array: ["Proses", "Koordinasi"]
+    $table->timestamps();
+});
+
+
+// surat keluar
+Schema::create('surat_keluar', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('user_id')->constrained()->onDelete('cascade');
+    $table->string('no_surat');
+    $table->date('tanggal_surat');
+    $table->date('tanggal_diterima');
+    $table->string('tujuan_surat');
+    $table->string('nomor_agenda')->nullable();
+    $table->string('perihal');
+    $table->enum('sifat', ['sangat segera', 'segera', 'rahasia'])->nullable();
+    $table->text('catatan')->nullable();
+    $table->string('file_path')->nullable();
+    $table->enum('status', ['aktif', 'arsip'])->default('aktif');
+    $table->timestamps();
+});
+
+
+// disposisi keluar
+Schema::create('disposisi_keluar', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('surat_keluar_id')->constrained('surat_keluar')->onDelete('cascade');
+    $table->foreignId('bidang_id')->constrained('bidang')->onDelete('restrict');
+    $table->json('harapan_tindakan')->nullable();
+    $table->timestamps();
+});
+
+```
