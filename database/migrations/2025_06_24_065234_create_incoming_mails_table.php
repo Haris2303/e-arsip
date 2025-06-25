@@ -22,9 +22,11 @@ return new class extends Migration
             $table->enum('priority', ['very urgent', 'urgent', 'confidential'])->nullable();
             $table->text('notes')->nullable();
             $table->string('file_path')->nullable();
+            $table->json('expected_actions')->nullable();
             $table->enum('status', ['active', 'archived'])->default('active');
             $table->timestamps();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('department_id')->nullable()->constrained('departments')->nullOnDelete();
         });
     }
 

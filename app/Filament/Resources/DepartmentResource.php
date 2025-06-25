@@ -22,6 +22,8 @@ class DepartmentResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    private static string $title = 'Departments';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -79,5 +81,25 @@ class DepartmentResource extends Resource
             'create' => Pages\CreateDepartment::route('/create'),
             'edit' => Pages\EditDepartment::route('/{record}/edit'),
         ];
+    }
+
+    public static function label(): string
+    {
+        return self::$title;
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return self::$title;
+    }
+
+    public static function getModelLabel(): string
+    {
+        return self::$title;
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return self::$title;
     }
 }

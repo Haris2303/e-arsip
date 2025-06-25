@@ -17,12 +17,23 @@ class IncomingMail extends Model
         'subject',
         'priority',
         'notes',
+        'expected_actions',
         'file_path',
         'status',
+        'department_id',
+    ];
+
+    protected $casts = [
+        'expected_actions' => 'array'
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
     }
 }
