@@ -7,6 +7,7 @@ use App\Filament\Resources\OutgoingMailResource\RelationManagers;
 use App\Models\IncomingMail;
 use App\Models\OutgoingMail;
 use Filament\Forms;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
@@ -37,23 +38,43 @@ class OutgoingMailResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('mail_number')->required(),
-                DatePicker::make('mail_date')->required(),
-                TextInput::make('recipient')->required(),
-                TextInput::make('agenda_number'),
-                TextInput::make('subject')->required(),
-                Select::make('priority')
+                TextInput::make('mail_number')->required()->label('Nomor Surat'),
+                DatePicker::make('mail_date')->required()->label('Tanggal Surat'),
+                TextInput::make('recipient')->required()->label('Penerima Surat'),
+                TextInput::make('agenda_number')->label('Nomor Agenda'),
+                TextInput::make('subject')->required()->label('Perihal'),
+                Select::make('priority')->label('Sifat')
                     ->options([
                         'very urgent' => 'Very Urgent',
                         'urgent' => 'Urgent',
                         'confidential' => 'Confidential',
                     ]),
-                Textarea::make('notes'),
+                Textarea::make('notes')->label('Catatan'),
                 FileUpload::make('file_path')
-                    ->label('Attachment')
+                    ->label('Unggah File')
                     ->directory('outgoing-mails')
-                    ->preserveFilenames(true)
                     ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png', 'image/webp', 'image/jpg'])
+                    ->required(),
+                Select::make('department_id')
+                    ->label('Diteruskan Kedapa Sdr.')
+                    ->relationship('department', 'name'),
+                CheckboxList::make('expected_actions')
+                    ->label('Dengan Hormat Harap')
+                    ->options([
+                        'proses-lebih-lanjut' => 'Proses Lebih Lanjut',
+                        'koordinasi-konfirmasi' => 'Koordinasi/Konfirmasi',
+                        'monitor-perkembangan' => 'Monitor Perkembangan',
+                        'untuk-menjadi-perhatian' => 'Untuk Menjadi Perhatian',
+                        'tanggapan-dan-saran' => 'Tanggapan dan Saran',
+                        'laporkan' => 'Laporkan',
+                        'bicarakan-bersama' => 'Bicarakan Bersama',
+                        'arsip-file' => 'Arsip/File',
+                        'koreksi-sempurnakan' => 'Koreksi/Sempurnakan',
+                        'hadir' => 'Hadir',
+                        'wakili' => 'Wakili',
+                        'siapkan-bahan' => 'Siapkan Bahan'
+                    ])
+                    ->columns(2)
                     ->required(),
                 Hidden::make('status')->default('active'),
             ]);

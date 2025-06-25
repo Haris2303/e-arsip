@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class OutgoingMail extends Model
 {
@@ -33,5 +34,14 @@ class OutgoingMail extends Model
     public function department()
     {
         return $this->belongsTo(Department::class);
+    }
+
+    protected static function booted()
+    {
+        static::deleting(function ($mail) {
+            if ($mail->file_path && Storage::disk('public')->exists($mail->file_path)) {
+                Storage::disk('public')->delete($mail->file_path);
+            }
+        });
     }
 }

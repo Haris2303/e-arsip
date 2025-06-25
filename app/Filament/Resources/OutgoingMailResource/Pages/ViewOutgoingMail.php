@@ -33,6 +33,8 @@ class ViewOutgoingMail extends ViewRecord
                                 DatePicker::make('sent_date')->disabled(),
                                 TextInput::make('subject')->disabled(),
                                 Textarea::make('notes')->disabled(),
+                                View::make('filament.expected-actions-list')
+                                    ->label('Harapan Tindakan'),
                             ])->columnSpan(1),
                         Grid::make()
                             ->columns(1)
