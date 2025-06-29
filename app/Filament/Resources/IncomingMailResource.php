@@ -28,7 +28,7 @@ class IncomingMailResource extends Resource
 {
     protected static ?string $model = IncomingMail::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-inbox';
 
     private static string $title = 'Surat Masuk';
 
@@ -127,12 +127,9 @@ class IncomingMailResource extends Resource
                     ]),
                 BadgeColumn::make('status')
                     ->colors([
-                        'primary' => 'incoming',
-                        'success' => 'archived',
+                        'success' => 'active',
+                        'gray' => 'archived',
                     ]),
-                TextColumn::make('expected_actions')
-                    ->label('Harapan Tindakan')
-                    ->formatStateUsing(fn($state) => is_array($state) ? implode(', ', $state) : $state),
             ])
             ->filters([
                 SelectFilter::make('Priority')
@@ -140,7 +137,12 @@ class IncomingMailResource extends Resource
                         'urgent' => 'Segera',
                         'very urgent' => 'Sangat Segera',
                         'confidential' => 'Rahasia',
-                    ])
+                    ]),
+                SelectFilter::make('status')
+                    ->options([
+                        'active' => 'Aktif',
+                        'archived' => 'Diarsipkan'
+                    ])->default('active')
             ])
             ->filtersTriggerAction(
                 fn(Action $action) => $action

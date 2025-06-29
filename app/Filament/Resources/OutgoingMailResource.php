@@ -30,7 +30,7 @@ class OutgoingMailResource extends Resource
 {
     protected static ?string $model = OutgoingMail::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-paper-airplane';
 
     private static string $title = "Surat Keluar";
 
@@ -58,6 +58,13 @@ class OutgoingMailResource extends Resource
                 Select::make('department_id')
                     ->label('Diteruskan Kedapa Sdr.')
                     ->relationship('department', 'name'),
+                Select::make('status')
+                    ->options([
+                        'active' => 'Active',
+                        'archived' => 'Archived',
+                    ])
+                    ->default('active')
+                    ->required(),
                 CheckboxList::make('expected_actions')
                     ->label('Dengan Hormat Harap')
                     ->options([
@@ -76,7 +83,6 @@ class OutgoingMailResource extends Resource
                     ])
                     ->columns(2)
                     ->required(),
-                Hidden::make('status')->default('active'),
             ]);
     }
 
@@ -103,7 +109,12 @@ class OutgoingMailResource extends Resource
                         'urgent' => 'Segera',
                         'very urgent' => 'Sangat Segera',
                         'confidential' => 'Rahasia',
-                    ])
+                    ]),
+                SelectFilter::make('status')
+                    ->options([
+                        'active' => 'Aktif',
+                        'archived' => 'Diarsipkan'
+                    ])->default('active')
             ])
             ->filtersTriggerAction(
                 fn(Action $action) => $action

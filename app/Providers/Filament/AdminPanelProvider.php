@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\ArchiveMails;
 use App\Filament\Resources\IncomingMailsChartResource\Widgets\IncomingMailsChart;
 use App\Filament\Resources\MailChartResource\Widgets\MailChartWidget;
 use App\Filament\Resources\MailStatsResource\Widgets\MailStatsWidget;
@@ -38,7 +39,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+                Pages\Dashboard::class
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
