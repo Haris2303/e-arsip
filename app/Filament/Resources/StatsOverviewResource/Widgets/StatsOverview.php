@@ -21,6 +21,14 @@ class StatsOverview extends BaseWidget
             $this->buildStat(
                 label: 'Surat Keluar Hari ini',
                 model: OutgoingMail::class
+            ),
+            $this->buildArchiveStat(
+                label: 'Arsip Surat Masuk',
+                model: IncomingMail::class
+            ),
+            $this->buildArchiveStat(
+                label: 'Arsip Surat Keluar',
+                model: OutgoingMail::class
             )
         ];
     }
@@ -39,6 +47,16 @@ class StatsOverview extends BaseWidget
             ->description($description)
             ->descriptionIcon($icon)
             ->color($color);
+    }
+
+    private function buildArchiveStat(string $label, string $model): Stat
+    {
+        $archivedCount = $model::where('status', 'archived')->count();
+
+        return Stat::make($label, number_format($archivedCount))
+            ->description('Total yang diarsipkan')
+            ->descriptionIcon('heroicon-m-archive-box')
+            ->color('gray');
     }
 
     private function formatDifference(int $diff): string
