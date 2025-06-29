@@ -20,8 +20,6 @@ use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 
 class IncomingMailResource extends Resource
@@ -196,5 +194,25 @@ class IncomingMailResource extends Resource
     public static function getPluralModelLabel(): string
     {
         return self::$title;
+    }
+
+    public static function canViewAny(): bool
+    {
+        return Auth::user()?->role === 'admin' || Auth::user()?->role === 'user';
+    }
+
+    public static function canCreate(): bool
+    {
+        return Auth::user()?->role === 'admin';
+    }
+
+    public static function canEdit($record): bool
+    {
+        return Auth::user()?->role === 'admin';
+    }
+
+    public static function canDelete($record): bool
+    {
+        return Auth::user()?->role === 'admin';
     }
 }

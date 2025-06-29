@@ -25,6 +25,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class OutgoingMailResource extends Resource
 {
@@ -180,5 +181,25 @@ class OutgoingMailResource extends Resource
                 'max:5120',
             ],
         ];
+    }
+
+    public static function canViewAny(): bool
+    {
+        return Auth::user()?->role === 'admin' || Auth::user()?->role === 'user';
+    }
+
+    public static function canCreate(): bool
+    {
+        return Auth::user()?->role === 'admin';
+    }
+
+    public static function canEdit($record): bool
+    {
+        return Auth::user()?->role === 'admin';
+    }
+
+    public static function canDelete($record): bool
+    {
+        return Auth::user()?->role === 'admin';
     }
 }

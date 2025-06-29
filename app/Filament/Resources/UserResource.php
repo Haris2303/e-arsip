@@ -15,6 +15,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class UserResource extends Resource
 {
@@ -97,5 +98,25 @@ class UserResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->where('role', 'user');
+    }
+
+    public static function canViewAny(): bool
+    {
+        return Auth::user()?->role === 'admin';
+    }
+
+    public static function canCreate(): bool
+    {
+        return Auth::user()?->role === 'admin';
+    }
+
+    public static function canEdit($record): bool
+    {
+        return Auth::user()?->role === 'admin';
+    }
+
+    public static function canDelete($record): bool
+    {
+        return Auth::user()?->role === 'admin';
     }
 }
