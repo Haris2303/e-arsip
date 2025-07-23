@@ -35,8 +35,8 @@ class StatsOverview extends BaseWidget
 
     private function buildStat(string $label, string $model): Stat
     {
-        $todayCount = $model::whereDate('created_at', today())->count();
-        $yesterdayCount = $model::whereDate('created_at', today()->subDay())->count();
+        $todayCount = $model::whereDate('created_at', today())->where('status', 'active')->count();
+        $yesterdayCount = $model::whereDate('created_at', today()->subDay())->where('status', 'active')->count();
         $diff = $todayCount - $yesterdayCount;
 
         $description = $this->formatDifference($diff);

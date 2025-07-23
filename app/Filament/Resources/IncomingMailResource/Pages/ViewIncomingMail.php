@@ -14,6 +14,8 @@ use Filament\Forms\Components\View;
 use Filament\Forms\Form;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\HtmlString;
 
 class ViewIncomingMail extends ViewRecord
@@ -37,6 +39,9 @@ class ViewIncomingMail extends ViewRecord
                                 DatePicker::make('received_date')->disabled()->label('Tanggal Diterima'),
                                 Textarea::make('notes')->disabled()->label('Catatan'),
                                 TextInput::make('priority')->disabled()->label('Sifat'),
+                                Placeholder::make('department')
+                                    ->label('Bidang')
+                                    ->content(fn($record) => $record->department?->name ?? '-'),
                                 View::make('filament.expected-actions-list')
                                     ->label('Harapan Tindakan'),
                             ])->columnSpan(1),
@@ -47,5 +52,15 @@ class ViewIncomingMail extends ViewRecord
                             ])->columnSpan(1)
                     ])
             ]);
+    }
+
+    public function getRecord(): Model
+    {
+        return parent::getRecord()->load('department');
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with('department');
     }
 }

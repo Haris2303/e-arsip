@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('outgoing_mails', function (Blueprint $table) {
             $table->id();
-            $table->string('mail_number');
+            $table->string('mail_number')->unique();
             $table->date('mail_date');
             $table->string('recipient');
             $table->string('agenda_number')->nullable();

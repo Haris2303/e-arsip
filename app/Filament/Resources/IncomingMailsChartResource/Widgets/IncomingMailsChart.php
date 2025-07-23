@@ -11,7 +11,7 @@ use Flowframe\Trend\TrendValue;
 
 class IncomingMailsChart extends ChartWidget
 {
-    protected static ?string $heading = 'Surat Masuk';
+    protected static ?string $heading = 'Chart Surat';
     public ?string $filter = 'today';
 
     protected function getData(): array
@@ -29,15 +29,16 @@ class IncomingMailsChart extends ChartWidget
                 $internal = 'perDay';
                 break;
 
-            case 'month':
-                $start = now()->startOfMonth();
-                $end = now()->endOfMonth();
-                $internal = 'perWeek';
-                break;
-            default:
+            case 'year':
                 $start = now()->startOfYear();
                 $end = now()->endOfYear();
                 $internal = 'perMonth';
+                break;
+
+            default:
+                $start = now()->subYears(5)->startOfYear();
+                $end = now()->endOfYear();
+                $internal = 'perYear';
         }
 
         // Get data Incoming Mails
@@ -82,9 +83,9 @@ class IncomingMailsChart extends ChartWidget
     {
         return [
             'today' => 'Hari Ini',
-            'week' => 'Minggu Terakhir',
-            'month' => 'Bulan Terakhir',
+            'week' => 'Minggu Ini',
             'year' => 'Tahun Ini',
+            'years' => '5 Tahun Terakhir'
         ];
     }
 

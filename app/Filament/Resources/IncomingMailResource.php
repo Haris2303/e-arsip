@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\IncomingMailResource\Pages;
 use App\Filament\Resources\IncomingMailResource\RelationManagers;
+use App\Models\Department;
 use App\Models\IncomingMail;
 use Filament\Forms;
 use Filament\Forms\Components\CheckboxList;
@@ -41,12 +42,13 @@ class IncomingMailResource extends Resource
                 TextInput::make('mail_number')
                     ->label('Nomor Surat')
                     ->required()
-                    ->unique()
                     ->maxLength(255),
 
                 TextInput::make('sender')
                     ->label('Surat Dari')
                     ->required(),
+
+                TextInput::make('agenda_number')->label('Nomor Agenda')->nullable(),
 
                 DatePicker::make('mail_date')
                     ->label('Tanggal Surat')
@@ -56,7 +58,7 @@ class IncomingMailResource extends Resource
                     ->label('Tanggal Diterima')
                     ->required(),
 
-                TextInput::make('agenda_number')->label('Nomor Agenda')->nullable(),
+                Textarea::make('notes')->label('Catatan')->nullable(),
 
                 Select::make('priority')
                     ->label('Sifat')
@@ -67,13 +69,15 @@ class IncomingMailResource extends Resource
                     ])
                     ->nullable(),
 
-                Textarea::make('notes')->label('Catatan')->nullable(),
-
                 FileUpload::make('file_path')
                     ->label('Unggah File')
                     ->acceptedFileTypes(['application/pdf', 'image/*'])
                     ->directory('incoming-mails')
                     ->required(),
+
+                Select::make('department_id')
+                    ->label('Tujuan Bidang')
+                    ->relationship('department', 'name'),
 
                 Select::make('status')
                     ->options([
@@ -82,10 +86,6 @@ class IncomingMailResource extends Resource
                     ])
                     ->default('active')
                     ->required(),
-
-                Select::make('department_id')
-                    ->label('Tujuan Bidang')
-                    ->relationship('department', 'name'),
 
                 CheckboxList::make('expected_actions')
                     ->label('Dengan Hormat Harap')
@@ -115,7 +115,8 @@ class IncomingMailResource extends Resource
             ->columns([
                 TextColumn::make('subject')->limit(30)->label('Perihal')->searchable(),
                 TextColumn::make('sender')->label('Surat Dari')->searchable(),
-                TextColumn::make('mail_date')->date()->label('Tanggal Surat'),
+                TextColumn::make('received_date')->date()->label('Tgl. Surat Diterima')->searchable(),
+                TextColumn::make('department.name'),
                 BadgeColumn::make('priority')
                     ->label('Sifat')
                     ->colors([
@@ -123,24 +124,23 @@ class IncomingMailResource extends Resource
                         'warning' => 'urgent',
                         'info' => 'confidential',
                     ]),
-                BadgeColumn::make('status')
-                    ->colors([
-                        'success' => 'active',
-                        'gray' => 'archived',
-                    ]),
             ])
             ->filters([
+                SelectFilter::make('department_id')
+                    ->label('Bidang')
+                    ->options(Department::all()->pluck('name', 'id')->toArray())
+                    ->searchable(),
+                SelectFilter::make('status')
+                    ->options([
+                        'active' => 'Aktif',
+                        'archived' => 'Diarsipkan'
+                    ])->default('active'),
                 SelectFilter::make('Priority')
                     ->options([
                         'urgent' => 'Segera',
                         'very urgent' => 'Sangat Segera',
                         'confidential' => 'Rahasia',
                     ]),
-                SelectFilter::make('status')
-                    ->options([
-                        'active' => 'Aktif',
-                        'archived' => 'Diarsipkan'
-                    ])->default('active')
             ])
             ->filtersTriggerAction(
                 fn(Action $action) => $action
@@ -148,13 +148,29 @@ class IncomingMailResource extends Resource
                     ->label('Filter')
             )
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()->color('info'),
+                Tables\Actions\Action::make('arsipkan')
+                    ->label('Arsipkan')
+                    ->icon('heroicon-o-archive-box')
+                    ->requiresConfirmation()
+                    ->visible(fn($record) => $record->status === 'active')
+                    ->action(function ($record) {
+                        $record->update(['status' => 'archived']);
+                    })->color('primary')
+                    ->modalHeading('Konfirmasi Arsip')
+                    ->modalDescription('Apakah kamu yakin ingin mengarsipkan data ini? Data akan tetap tersimpan namun tidak tampil di daftar utama.'),
+                Tables\Actions\EditAction::make()->color('success'),
                 Tables\Actions\DeleteAction::make(),
             ])
+
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make('arsipkan')
+                        ->label('Arsipkan Surat')
+                        ->icon('heroicon-o-archive-box')
+                        ->requiresConfirmation()
+                        ->action(fn($records) => $records->each->update(['status' => 'archived'])),
                 ]),
             ]);
     }

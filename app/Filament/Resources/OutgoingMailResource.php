@@ -39,50 +39,24 @@ class OutgoingMailResource extends Resource
     {
         return $form
             ->schema([
+                TextInput::make('subject')->required()->label('Perihal'),
                 TextInput::make('mail_number')->required()->label('Nomor Surat'),
-                DatePicker::make('mail_date')->required()->label('Tanggal Surat'),
                 TextInput::make('recipient')->required()->label('Penerima Surat'),
                 TextInput::make('agenda_number')->label('Nomor Agenda'),
-                TextInput::make('subject')->required()->label('Perihal'),
-                Select::make('priority')->label('Sifat')
-                    ->options([
-                        'very urgent' => 'Very Urgent',
-                        'urgent' => 'Urgent',
-                        'confidential' => 'Confidential',
-                    ]),
+                DatePicker::make('mail_date')->required()->label('Tanggal Surat'),
+                TextInput::make('attachment')->label('Lampiran'),
                 Textarea::make('notes')->label('Catatan'),
                 FileUpload::make('file_path')
                     ->label('Unggah File')
                     ->directory('outgoing-mails')
                     ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png', 'image/webp', 'image/jpg'])
                     ->required(),
-                Select::make('department_id')
-                    ->label('Diteruskan Kedapa Sdr.')
-                    ->relationship('department', 'name'),
                 Select::make('status')
                     ->options([
                         'active' => 'Active',
                         'archived' => 'Archived',
                     ])
                     ->default('active')
-                    ->required(),
-                CheckboxList::make('expected_actions')
-                    ->label('Dengan Hormat Harap')
-                    ->options([
-                        'proses-lebih-lanjut' => 'Proses Lebih Lanjut',
-                        'koordinasi-konfirmasi' => 'Koordinasi/Konfirmasi',
-                        'monitor-perkembangan' => 'Monitor Perkembangan',
-                        'untuk-menjadi-perhatian' => 'Untuk Menjadi Perhatian',
-                        'tanggapan-dan-saran' => 'Tanggapan dan Saran',
-                        'laporkan' => 'Laporkan',
-                        'bicarakan-bersama' => 'Bicarakan Bersama',
-                        'arsip-file' => 'Arsip/File',
-                        'koreksi-sempurnakan' => 'Koreksi/Sempurnakan',
-                        'hadir' => 'Hadir',
-                        'wakili' => 'Wakili',
-                        'siapkan-bahan' => 'Siapkan Bahan'
-                    ])
-                    ->columns(2)
                     ->required(),
             ]);
     }
@@ -93,24 +67,13 @@ class OutgoingMailResource extends Resource
             ->columns([
                 TextColumn::make('subject')->limit(30)->label('Perihal')->searchable(),
                 TextColumn::make('recipient')->searchable()->label('Penerima Surat'),
-                TextColumn::make('mail_date')->date()->label('Tanggal Surat'),
-                BadgeColumn::make('priority')->colors([
-                    'danger' => 'very urgent',
-                    'warning' => 'urgent',
-                    'info' => 'confidential',
-                ])->label('Sifat'),
+                TextColumn::make('mail_date')->date()->label('Tanggal Surat')->searchable(),
                 BadgeColumn::make('status')->colors([
                     'success' => 'active',
                     'gray' => 'archived',
                 ]),
             ])
             ->filters([
-                SelectFilter::make('Priority')
-                    ->options([
-                        'urgent' => 'Segera',
-                        'very urgent' => 'Sangat Segera',
-                        'confidential' => 'Rahasia',
-                    ]),
                 SelectFilter::make('status')
                     ->options([
                         'active' => 'Aktif',
@@ -123,13 +86,28 @@ class OutgoingMailResource extends Resource
                     ->label('Filter'),
             )
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()->color('info'),
+                Tables\Actions\Action::make('arsipkan')
+                    ->label('Arsipkan')
+                    ->icon('heroicon-o-archive-box')
+                    ->requiresConfirmation()
+                    ->visible(fn($record) => $record->status === 'active')
+                    ->action(function ($record) {
+                        $record->update(['status' => 'archived']);
+                    })->color('primary')
+                    ->modalHeading('Konfirmasi Arsip')
+                    ->modalDescription('Apakah kamu yakin ingin mengarsipkan data ini? Data akan tetap tersimpan namun tidak tampil di daftar utama.'),
+                Tables\Actions\EditAction::make()->color('success'),
                 Tables\Actions\DeleteAction::make()
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make('arsipkan')
+                        ->label('Arsipkan Surat')
+                        ->icon('heroicon-o-archive-box')
+                        ->requiresConfirmation()
+                        ->action(fn($records) => $records->each->update(['status' => 'archived'])),
                 ]),
             ]);
     }

@@ -27,14 +27,12 @@ class ViewOutgoingMail extends ViewRecord
                         Grid::make()
                             ->columns(1)
                             ->schema([
-                                TextInput::make('mail_number')->disabled(),
-                                TextInput::make('recipient')->disabled(),
-                                DatePicker::make('mail_date')->disabled(),
-                                DatePicker::make('sent_date')->disabled(),
-                                TextInput::make('subject')->disabled(),
-                                Textarea::make('notes')->disabled(),
-                                View::make('filament.expected-actions-list')
-                                    ->label('Harapan Tindakan'),
+                                TextInput::make('subject')->disabled()->label('Perihal'),
+                                TextInput::make('mail_number')->disabled()->label('Nomor Surat'),
+                                TextInput::make('recipient')->disabled()->label('Penerima Surat'),
+                                TextInput::make('attachment')->disabled()->label('Lampiran'),
+                                DatePicker::make('mail_date')->disabled()->label('Tanggal Surat'),
+                                Textarea::make('notes')->disabled()->label('Catatan'),
                             ])->columnSpan(1),
                         Grid::make()
                             ->columns(1)
