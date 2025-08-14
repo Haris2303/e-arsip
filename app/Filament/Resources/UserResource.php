@@ -95,28 +95,28 @@ class UserResource extends Resource
         ];
     }
 
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()->where('role', 'user');
-    }
+    // public static function getEloquentQuery(): Builder
+    // {
+    //     return parent::getEloquentQuery()->where('role', 'user');
+    // }
 
     public static function canViewAny(): bool
     {
-        return Auth::user()?->role === 'admin';
+        return Auth::user()?->is_superadmin;
     }
 
     public static function canCreate(): bool
     {
-        return Auth::user()?->role === 'admin';
+        return Auth::user()?->is_superadmin;
     }
 
     public static function canEdit($record): bool
     {
-        return Auth::user()?->role === 'admin';
+        return Auth::user()?->is_superadmin;
     }
 
     public static function canDelete($record): bool
     {
-        return Auth::user()?->role === 'admin';
+        return Auth::user()?->is_superadmin;
     }
 }

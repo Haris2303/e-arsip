@@ -6,6 +6,7 @@ use App\Filament\Resources\DepartmentResource\Pages;
 use App\Filament\Resources\DepartmentResource\RelationManagers;
 use App\Models\Department;
 use Filament\Forms;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Form;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -29,6 +30,8 @@ class DepartmentResource extends Resource
     {
         return $form
             ->schema([
+                Hidden::make('user_id')->default(Auth::user()->id),
+
                 TextInput::make('name')
                     ->label('Department Name')
                     ->required()
@@ -47,13 +50,15 @@ class DepartmentResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label('Name')
+                    ->label('Nama')
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('description')
-                    ->label('Description')
+                    ->label('Deskripsi')
                     ->limit(50),
+                TextColumn::make('created_at')->label('Terakhir Dibuat'),
+                TextColumn::make('user.name')->label('Dibuat Oleh')
             ])->defaultSort('name')
             ->filters([
                 //

@@ -44,6 +44,9 @@ class ViewIncomingMail extends ViewRecord
                                     ->content(fn($record) => $record->department?->name ?? '-'),
                                 View::make('filament.expected-actions-list')
                                     ->label('Harapan Tindakan'),
+                                Placeholder::make('user.name')
+                                    ->label('Dibuat Oleh')
+                                    ->content(fn($record) => $record->user?->name ?? '-'),
                             ])->columnSpan(1),
                         Grid::make()
                             ->columns(1)

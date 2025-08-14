@@ -7,6 +7,7 @@ use Filament\Actions;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\View;
@@ -33,6 +34,9 @@ class ViewOutgoingMail extends ViewRecord
                                 TextInput::make('attachment')->disabled()->label('Lampiran'),
                                 DatePicker::make('mail_date')->disabled()->label('Tanggal Surat'),
                                 Textarea::make('notes')->disabled()->label('Catatan'),
+                                Placeholder::make('user.name')
+                                    ->label('Dibuat Oleh')
+                                    ->content(fn($record) => $record->user?->name ?? '-'),
                             ])->columnSpan(1),
                         Grid::make()
                             ->columns(1)
